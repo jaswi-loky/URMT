@@ -19,9 +19,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String selectedIp = '10.1.16.118';
-
+  String? selectedIp; // 初始无选中
   final List<String> ipList = [
+    '', // 空选项
     '10.1.16.118',
     '10.1.17.101',
     '10.1.17.240',
@@ -33,11 +33,12 @@ class _HomePageState extends State<HomePage> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+        final isPortrait =
+            MediaQuery.of(context).orientation == Orientation.portrait;
         final topHeight = constraints.maxHeight * 0.25;
         final buttonTextSize = constraints.maxHeight * 0.04;
-        // 按需缩放
-        final actualButtonTextSize = isPortrait ? buttonTextSize * 0.8 : buttonTextSize;
+        final actualButtonTextSize =
+            isPortrait ? buttonTextSize * 0.8 : buttonTextSize;
 
         return Scaffold(
           body: Column(
@@ -50,13 +51,13 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildButton('Navigate', actualButtonTextSize),
-                    _buildButton('Summon', actualButtonTextSize),
-                    _buildButton('Settings', actualButtonTextSize),
+                    _buildButton('Navigate', actualButtonTextSize, context),
+                    _buildButton('Summon', actualButtonTextSize, context),
+                    _buildButton('Settings', actualButtonTextSize, context),
                   ],
                 ),
               ),
-              // 空白行，保证和下方画布白色一致
+              // 空白行
               Container(
                 height: 32,
                 width: double.infinity,
@@ -67,7 +68,7 @@ class _HomePageState extends State<HomePage> {
                 height: 96,
                 width: double.infinity,
                 color: commonWhite,
-                padding: EdgeInsets.symmetric(horizontal: 28.8), // 36.0 * 0.8
+                padding: EdgeInsets.symmetric(horizontal: 28.8),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -79,27 +80,155 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.black87,
                       ),
                     ),
-                    SizedBox(width: 19.2), // 24 * 0.8
+                    SizedBox(width: 19.2),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 14.4, vertical: 9.6), // 18.0*0.8, 12.0*0.8
+                      padding: EdgeInsets.symmetric(horizontal: 14.4, vertical: 9.6),
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey, width: 0.4), // 0.5 * 0.8
-                        borderRadius: BorderRadius.circular(4.8), // 6.0 * 0.8
+                        border: Border.all(color: Colors.grey, width: 0.4),
+                        borderRadius: BorderRadius.circular(4.8),
                         color: commonWhite,
                       ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: selectedIp,
+                          hint: Text(''),
+                          icon: Icon(Icons.arrow_drop_down, size: 28.8),
+                          style: TextStyle(
+                            fontFamily: 'Georgia',
+                            fontSize: 24,
+                            color: Colors.black87,
+                          ),
+                          itemHeight: 57.6,
+                          items: ipList.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value.isEmpty ? null : value,
+                              child: Text(
+                                value,
+                                style: TextStyle(
+                                  fontFamily: 'Georgia',
+                                  fontSize: 24,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedIp = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // 空白画布区域
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  color: commonWhite,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildButton(String label, double fontSize, BuildContext context) {
+    return TextButton(
+      onPressed: label == 'Summon'
+          ? () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => SummonPage(),
+                ),
+              );
+            }
+          : null,
+      child: Text(
+        label,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: fontSize,
+          fontFamily: 'Georgia',
+        ),
+      ),
+    );
+  }
+}
+
+class SummonPage extends StatefulWidget {
+  @override
+  State<SummonPage> createState() => _SummonPageState();
+}
+
+class _SummonPageState extends State<SummonPage> {
+  String? selectedPoint; // 初始无选中
+  final List<String> arrivePoints = [
+    '', // 空选项
+    'arrive_point_1',
+    'arrive_point_2',
+    'arrive_point_3',
+    'arrive_point_4',
+    'arrive_point_5',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final Color commonWhite = Colors.white;
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 93, 59, 215),
+        iconTheme: IconThemeData(color: Colors.white),
+        elevation: 0,
+      ),
+      body: Container(
+        color: commonWhite,
+        width: double.infinity,
+        height: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 28.8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 48),
+            Container(
+              height: 96,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Send the robot to:',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontFamily: 'Georgia',
+                      color: Colors.black87,
+                    ),
+                  ),
+                  SizedBox(width: 19.2),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 14.4, vertical: 9.6),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey, width: 0.4),
+                      borderRadius: BorderRadius.circular(4.8),
+                      color: commonWhite,
+                    ),
+                    child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        value: selectedIp,
-                        underline: SizedBox(),
-                        icon: Icon(Icons.arrow_drop_down, size: 28.8), // 36 * 0.8
+                        value: selectedPoint,
+                        hint: Text(''),
+                        icon: Icon(Icons.arrow_drop_down, size: 28.8),
                         style: TextStyle(
                           fontFamily: 'Georgia',
                           fontSize: 24,
                           color: Colors.black87,
                         ),
-                        itemHeight: 57.6, // 72 * 0.8
-                        items: ipList.map((String value) {
+                        itemHeight: 57.6,
+                        items: arrivePoints.map((String value) {
                           return DropdownMenuItem<String>(
-                            value: value,
+                            value: value.isEmpty ? null : value,
                             child: Text(
                               value,
                               style: TextStyle(
@@ -111,38 +240,16 @@ class _HomePageState extends State<HomePage> {
                         }).toList(),
                         onChanged: (String? newValue) {
                           setState(() {
-                            selectedIp = newValue!;
+                            selectedPoint = newValue;
                           });
                         },
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              // 下面的空白画布区域
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  color: commonWhite,
-                  // 空白，无任何内容
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildButton(String label, double fontSize) {
-    return TextButton(
-      onPressed: () {},
-      child: Text(
-        label,
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: fontSize,
-          fontFamily: 'Georgia',
+            ),
+          ],
         ),
       ),
     );
