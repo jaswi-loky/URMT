@@ -33,8 +33,11 @@ class _HomePageState extends State<HomePage> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        final isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
         final topHeight = constraints.maxHeight * 0.25;
         final buttonTextSize = constraints.maxHeight * 0.04;
+        // 按需缩放
+        final actualButtonTextSize = isPortrait ? buttonTextSize * 0.8 : buttonTextSize;
 
         return Scaffold(
           body: Column(
@@ -47,9 +50,9 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildButton('Navigate', buttonTextSize),
-                    _buildButton('Summon', buttonTextSize),
-                    _buildButton('Settings', buttonTextSize),
+                    _buildButton('Navigate', actualButtonTextSize),
+                    _buildButton('Summon', actualButtonTextSize),
+                    _buildButton('Settings', actualButtonTextSize),
                   ],
                 ),
               ),
@@ -80,7 +83,7 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 14.4, vertical: 9.6), // 18.0*0.8, 12.0*0.8
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey, width: 0.5 * 0.8), // 更细
+                        border: Border.all(color: Colors.grey, width: 0.4), // 0.5 * 0.8
                         borderRadius: BorderRadius.circular(4.8), // 6.0 * 0.8
                         color: commonWhite,
                       ),
