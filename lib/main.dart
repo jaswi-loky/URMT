@@ -79,6 +79,20 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _goToNavigatePage(BuildContext context) {
+    if (selectedIp == null || selectedIp!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please first select the IP Address')),
+      );
+      return;
+    }
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => NavigatePage(selectedIp: selectedIp!),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final Color commonWhite = Colors.white;
@@ -103,13 +117,7 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _buildButton('Navigate', actualButtonTextSize, context,
-                        onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const NavigatePage(),
-                        ),
-                      );
-                    }),
+                        onPressed: () => _goToNavigatePage(context)),
                     _buildButton(
                       'Summon',
                       actualButtonTextSize,
@@ -353,7 +361,8 @@ class _SummonPageState extends State<SummonPage> {
 enum Speed { slow, normal, fast }
 
 class NavigatePage extends StatefulWidget {
-  const NavigatePage({super.key});
+  final String selectedIp;
+  const NavigatePage({super.key, required this.selectedIp});
 
   @override
   State<NavigatePage> createState() => _NavigatePageState();
@@ -374,7 +383,7 @@ class _NavigatePageState extends State<NavigatePage> {
   double _lastAngular = 0;
   bool _estopActive = false;
 
-  static const String baseUrl = 'http://192.168.10.10:9001/api/joy_control';
+  String get baseUrl => 'http://${widget.selectedIp}:9001/api/joy_control';
 
   Future<void> sendCommand(double angular, double linear) async {
     _lastAngular = angular;
@@ -391,7 +400,7 @@ class _NavigatePageState extends State<NavigatePage> {
       _estopActive = !_estopActive;
     });
     final flag = _estopActive ? 'true' : 'false';
-    final url = Uri.parse('http://192.168.10.10:9001/api/estop?flag=$flag');
+    final url = Uri.parse('http://${widget.selectedIp}:9001/api/estop?flag=$flag');
     try {
       await http.get(url);
     } catch (e) {}
@@ -529,18 +538,12 @@ class _NavigatePageState extends State<NavigatePage> {
     final orientation = MediaQuery.of(context).orientation;
     final bool isLandscape = orientation == Orientation.landscape;
 
-    // 横屏时大圆等为0.7*1.2=0.84倍，Speed-radio为0.7*1.5=1.05倍
     final double padScale = isLandscape ? 0.84 : 1.0;
     final double radioScale = isLandscape ? 1.05 : 1.0;
-
-    // Speed和ESTOP相关字体横屏额外1.5倍
     final double speedTextFont = isLandscape ? 24 * 0.7 * 1.5 : 24;
     final double speedRadioFont = isLandscape ? 22 * 0.7 * 1.5 : 22;
     final double estopDescFont = isLandscape ? 20 * 0.7 * 1.5 : 20;
-
-    // 大圆和Speed那行间距：先缩短横屏一半，再缩放padScale
     final double sizedBox80 = isLandscape ? 80 * 0.5 * padScale : 80;
-    // 两行间距横屏缩短一半
     final double sizedBoxBetween = isLandscape ? 28 * 0.5 : 28;
     final double sizedBox24 = isLandscape ? 24 * 0.5 : 24;
 
