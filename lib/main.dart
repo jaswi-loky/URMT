@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'update.dart'; 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -26,6 +26,18 @@ class _HomePageState extends State<HomePage> {
     '10.1.17.101',
     '10.1.17.240',
   ];
+  final UpdateService _updateService = UpdateService();
+  @override
+  void initState() {
+    super.initState();
+    // Check for updates when the app starts (optional)
+    // Add a delay if you don't want it immediately on startup
+    Future.delayed(Duration(seconds: 2), () {
+      if (mounted) { // Ensure widget is still in the tree
+         _updateService.checkForUpdate(context);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
