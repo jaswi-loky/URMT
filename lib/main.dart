@@ -53,6 +53,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     _buildButton('Navigate', actualButtonTextSize, context),
                     _buildButton('Summon', actualButtonTextSize, context),
+                    _buildButton('Functions', actualButtonTextSize, context),
                     _buildButton('Settings', actualButtonTextSize, context),
                   ],
                 ),
@@ -137,16 +138,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildButton(String label, double fontSize, BuildContext context) {
+    VoidCallback? onPressed;
+    switch (label) {
+      case 'Summon':
+        onPressed = () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => SummonPage()),
+          );
+        };
+        break;
+      case 'Functions':
+        onPressed = () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => FunctionsPage()),
+          );
+        };
+        break;
+      default:
+        onPressed = null;
+    }
     return TextButton(
-      onPressed: label == 'Summon'
-          ? () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => SummonPage(),
-                ),
-              );
-            }
-          : null,
+      onPressed: onPressed,
       child: Text(
         label,
         style: TextStyle(
@@ -251,6 +263,22 @@ class _SummonPageState extends State<SummonPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+// NEW: A new class for the Functions page
+class FunctionsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Functions'),
+        backgroundColor: const Color.fromARGB(255, 93, 59, 215), // Same purple color
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      body: Center(
+        child: Text('This is the Functions Page'),
       ),
     );
   }
