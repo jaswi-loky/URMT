@@ -137,7 +137,7 @@ class _FunctionsPageState extends State<FunctionsPage> {
     final String executorsJsonString = jsonEncode(executorsList);
 
     final Map<String, dynamic> requestData = {
-      "cabinKey": "SCQS00S039YF00153",
+      "cabinKey": "SCQS00G13C0100349",
       "cabinDeviceType": 456,
       "taskType": 0,
       "clientToken": "41f04677025c4808a1df84138eb6e53e",
@@ -172,8 +172,66 @@ class _FunctionsPageState extends State<FunctionsPage> {
     }
   }
 
+  final Map<String, dynamic> sweepZone1 = {
+    "coordinates": [
+      {"x": "0.81", "y": "-9.59"},
+      {"x": "0.69", "y": "-13.43"},
+      {"x": "4.62", "y": "-13.58"},
+      {"x": "4.74", "y": "-9.8"},
+    ],
+    "creator": "WTHT08E0390415704",
+    "dirtyImgUrls": [],
+    "floor": 1,
+    "id": "20240514040328107630247857670629",
+    "label": "",
+    "level": 1,
+    "material": "marble",
+    "probability": "",
+    "zoneName": "1F_test2",
+    "zoneType": "SWEEP",
+  };
+
+    final Map<String, dynamic> sweepZone2 = {
+    "coordinates": [
+      {"x": "0.57", "y": "-1.46"},
+      {"x": "0.09", "y": "-9.14"},
+      {"x": "3.12", "y": "-9.29"},
+      {"x": "3.57", "y": "-1.64"},
+    ],
+    "creator": "WTHT08E0390415704",
+    "dirtyImgUrls": [],
+    "floor": 1,
+    "id": "20240514040328107630247857670630",
+    "label": "",
+    "level": 1,
+    "material": "marble",
+    "probability": "",
+    "zoneName": "1F_testing_1",
+    "zoneType": "SWEEP",
+  };
+
+    final Map<String, dynamic> sweepZone3 = {
+    "coordinates": [
+      {"x": "5.29", "y": "4.07"},
+      {"x": "5.39", "y": "-3.03"},
+      {"x": "11.05", "y": "-2.95"},
+      {"x": "10.95", "y": "4.19"},
+    ],
+    "creator": "WTHT08E0390415704",
+    "dirtyImgUrls": [],
+    "floor": 1,
+    "id": "20240514040328107630247857670631",
+    "label": "",
+    "level": 0,
+    "material": "carpet",
+    "probability": "",
+    "zoneName": "1F_testing_2",
+    "zoneType": "SWEEP",
+  };
+
+
   // FIX: Added 'async' and corrected hardness parameter usage
-  void _startCarpetVacuuming(BuildContext context, String hardness) async {
+  void _startCarpetVacuuming(BuildContext context, String hardness, Map sweepZone) async {
     const int port = 18080;
     const String path = '/api/v1/task/flow';
     final String apiUrl = 'http://$_robotIpAddress:$port$path';
@@ -182,44 +240,26 @@ class _FunctionsPageState extends State<FunctionsPage> {
     final String clientToken = _uuid.v4().replaceAll('-', '');
     final String timestamp = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now().toUtc());
 
-    final Map<String, dynamic> sweepZone1 = {
-      "coordinates": [
-        {"x": "5.29", "y": "4.07"},
-        {"x": "5.39", "y": "-3.03"},
-        {"x": "11.05", "y": "-2.95"},
-        {"x": "10.95", "y": "4.19"},
-      ],
-      "creator": "{wt_sn}",
-      "dirtyImgUrls": [],
-      "floor": 7,
-      "id": "20240514040328107630247857670629",
-      "label": "",
-      "level": 0,
-      "material": "marble",
-      "probability": "",
-      "zoneName": "{zone}",
-      "zoneType": "SWEEP",
-    };
 
     final Map<String, dynamic> executorObject = {
       "optionId": "1002",
       "executionId": "sweep",
       "params": {
-        "cabinKey": "SCQS00S039YF00153",
+        "cabinKey": "SCQS00G13C0100349",
         "attach": {
           "storeId": "202412209218662201730709785088",
           "taskId": ["{taskId}"],
         },
         "hcp": 2,
         "hardness": hardness, // FIX: Changed 'L' to use the 'hardness' parameter
-        "zones": [sweepZone1],
+        "zones": [sweepZone],
       }
     };
 
     final String executorsJsonString = jsonEncode([executorObject]); // FIX: executorObject should be in a list
 
     final Map<String, dynamic> requestData = {
-      "cabinKey": "SCQS00S039YF00153",
+      "cabinKey": "SCQS00G13C0100349",
       "cabinDeviceType": 456,
       "taskType": 0,
       "clientToken": clientToken,
@@ -255,12 +295,12 @@ class _FunctionsPageState extends State<FunctionsPage> {
 
   // FIX: Added BuildContext parameter
   void _startFloorSweeping(BuildContext context) {
-    _startCarpetVacuuming(context, "M"); // FIX: Added semicolon
+    _startCarpetVacuuming(context, "H", sweepZone1);
   }
 
   // FIX: Added BuildContext parameter
   void _startMarbleMopping(BuildContext context) {
-    _startCarpetVacuuming(context, "S"); // FIX: Added semicolon
+    _startCarpetVacuuming(context, "S", sweepZone2); // FIX: Added semicolon
   }
 
   void _cancelCleaning(BuildContext context) {
@@ -334,7 +374,7 @@ class _FunctionsPageState extends State<FunctionsPage> {
                     _buildActionButton(
                       text: 'Start Carpet Vacuuming',
                       emoji: '👾🧹',
-                      onPressed: () => _startCarpetVacuuming(context, "H"),
+                      onPressed: () => _startCarpetVacuuming(context, "M", sweepZone3),
                     ),
                     _buildActionButton(
                       text: 'Start floor Sweeping',
