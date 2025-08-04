@@ -5,7 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
 class FunctionsPage extends StatefulWidget {
+  final String? newIp;
   @override
+  const FunctionsPage({Key? key, required this.newIp}) : super(key: key);
   _FunctionsPageState createState() => _FunctionsPageState();
 }
 class _FunctionsPageState extends State<FunctionsPage> {
@@ -14,7 +16,7 @@ class _FunctionsPageState extends State<FunctionsPage> {
   String? _selectedMap = 'map_1';
   final List<String> _mapOptions = ['map_1', 'map_2', 'map_3', 'map_4','map_5'];
 
-  final String _robotIpAddress = '192.168.10.10';
+  final String _robotIpAddress = '10.1.17.101';
   final Uuid _uuid = Uuid();
 
   // --- 1. Reusable API Helper Function ---
@@ -95,14 +97,14 @@ class _FunctionsPageState extends State<FunctionsPage> {
 
   void _attachChassis(BuildContext context) async {
     const int port = 18080;
-    const String path = '/v1/task/flow';
+    const String path = '/api/v1/task/flow';
     final String apiUrl = 'http://$_robotIpAddress:$port$path';
 
     final String taskId = DateTime.now().millisecondsSinceEpoch.toString();
     final String timestamp = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now().toUtc());
 
-    const String scqSn = "SCQS00S039YF00153";
-    const String movePoint = "hardcoded_move_point";
+    const String scqSn = "SCQS00G13C0100349";
+    const String movePoint = "waiting";
 
     final Map<String, dynamic> optionDocking = {
       "optionId": "1001",
@@ -137,7 +139,7 @@ class _FunctionsPageState extends State<FunctionsPage> {
     final String executorsJsonString = jsonEncode(executorsList);
 
     final Map<String, dynamic> requestData = {
-      "cabinKey": "SCQS00S039YF00153",
+      "cabinKey": "SCQS00G13C0100349",
       "cabinDeviceType": 456,
       "taskType": 0,
       "clientToken": "41f04677025c4808a1df84138eb6e53e",
@@ -172,54 +174,94 @@ class _FunctionsPageState extends State<FunctionsPage> {
     }
   }
 
+  final Map<String, dynamic> sweepZone1 = {
+    "coordinates": [
+      {"x": "0.81", "y": "-9.59"},
+      {"x": "0.69", "y": "-13.43"},
+      {"x": "4.62", "y": "-13.58"},
+      {"x": "4.74", "y": "-9.8"},
+    ],
+    "creator": "WTHT08E0390415704",
+    "dirtyImgUrls": [],
+    "floor": 1,
+    "id": "20240514040328107630247857670629",
+    "label": "",
+    "level": 1,
+    "material": "marble",
+    "probability": "",
+    "zoneName": "1F_test2",
+    "zoneType": "SWEEP",
+  };
+
+    final Map<String, dynamic> sweepZone2 = {
+    "coordinates": [
+      {"x": "0.57", "y": "-1.46"},
+      {"x": "0.09", "y": "-9.14"},
+      {"x": "3.12", "y": "-9.29"},
+      {"x": "3.57", "y": "-1.64"},
+    ],
+    "creator": "WTHT08E0390415704",
+    "dirtyImgUrls": [],
+    "floor": 1,
+    "id": "20240514040328107630247857670630",
+    "label": "",
+    "level": 1,
+    "material": "marble",
+    "probability": "",
+    "zoneName": "1F_testing_1",
+    "zoneType": "SWEEP",
+  };
+
+    final Map<String, dynamic> sweepZone3 = {
+    "coordinates": [
+      {"x": "5.29", "y": "4.07"},
+      {"x": "5.39", "y": "-3.03"},
+      {"x": "11.05", "y": "-2.95"},
+      {"x": "10.95", "y": "4.19"},
+    ],
+    "creator": "WTHT08E0390415704",
+    "dirtyImgUrls": [],
+    "floor": 1,
+    "id": "20240514040328107630247857670631",
+    "label": "",
+    "level": 0,
+    "material": "carpet",
+    "probability": "",
+    "zoneName": "1F_testing_2",
+    "zoneType": "SWEEP",
+  };
+
+
   // FIX: Added 'async' and corrected hardness parameter usage
-  void _startCarpetVacuuming(BuildContext context, String hardness) async {
+  void _startCarpetVacuuming(BuildContext context, String hardness, List sweepZones) async {
     const int port = 18080;
-    const String path = '/v1/task/flow';
+    const String path = '/api/v1/task/flow';
     final String apiUrl = 'http://$_robotIpAddress:$port$path';
 
     final String taskId = _uuid.v4();
     final String clientToken = _uuid.v4().replaceAll('-', '');
     final String timestamp = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now().toUtc());
 
-    final Map<String, dynamic> sweepZone1 = {
-      "coordinates": [
-        {"x": "5.29", "y": "4.07"},
-        {"x": "5.39", "y": "-3.03"},
-        {"x": "11.05", "y": "-2.95"},
-        {"x": "10.95", "y": "4.19"},
-      ],
-      "creator": "{wt_sn}",
-      "dirtyImgUrls": [],
-      "floor": 7,
-      "id": "20240514040328107630247857670629",
-      "label": "",
-      "level": 0,
-      "material": "marble",
-      "probability": "",
-      "zoneName": "{zone}",
-      "zoneType": "SWEEP",
-    };
 
     final Map<String, dynamic> executorObject = {
       "optionId": "1002",
       "executionId": "sweep",
       "params": {
-        "cabinKey": "SCQS00S039YF00153",
+        "cabinKey": "SCQS00G13C0100349",
         "attach": {
           "storeId": "202412209218662201730709785088",
           "taskId": ["{taskId}"],
         },
         "hcp": 2,
         "hardness": hardness, // FIX: Changed 'L' to use the 'hardness' parameter
-        "zones": [sweepZone1],
+        "zones": sweepZones,
       }
     };
 
     final String executorsJsonString = jsonEncode([executorObject]); // FIX: executorObject should be in a list
 
     final Map<String, dynamic> requestData = {
-      "cabinKey": "SCQS00S039YF00153",
+      "cabinKey": "SCQS00G13C0100349",
       "cabinDeviceType": 456,
       "taskType": 0,
       "clientToken": clientToken,
@@ -255,19 +297,19 @@ class _FunctionsPageState extends State<FunctionsPage> {
 
   // FIX: Added BuildContext parameter
   void _startFloorSweeping(BuildContext context) {
-    _startCarpetVacuuming(context, "M"); // FIX: Added semicolon
+    _startCarpetVacuuming(context, "H", [sweepZone1, sweepZone2]);
   }
 
   // FIX: Added BuildContext parameter
   void _startMarbleMopping(BuildContext context) {
-    _startCarpetVacuuming(context, "S"); // FIX: Added semicolon
+    _startCarpetVacuuming(context, "S", [sweepZone2, sweepZone1]); // FIX: Added semicolon
   }
 
   void _cancelCleaning(BuildContext context) {
     _postApiCall(
       context: context,
       port: 19001,
-      path: '/tools/operation/task/cancel',
+      path: '/api/tools/operation/task/cancel',
       successMessage: 'Cleaning Canceled Successfully!',
       failureMessage: 'Failed to cancel cleaning.',
     );
@@ -277,7 +319,7 @@ class _FunctionsPageState extends State<FunctionsPage> {
     _postApiCall(
       context: context,
       port: 19001,
-      path: '/tools/operation/task/go-back',
+      path: '/api/tools/operation/task/go-back',
       successMessage: 'Robot is returning to charge.',
       failureMessage: 'Failed to send return command.',
     );
@@ -287,7 +329,7 @@ class _FunctionsPageState extends State<FunctionsPage> {
     _postApiCall(
       context: context,
       port: 19001,
-      path: '/tools/operation/lift/up',
+      path: '/api/tools/operation/lift/up',
       successMessage: 'Robot lifts successfully',
       failureMessage: 'Failed to lift the robot',
     );
@@ -334,17 +376,18 @@ class _FunctionsPageState extends State<FunctionsPage> {
                     _buildActionButton(
                       text: 'Start Carpet Vacuuming',
                       emoji: '👾🧹',
-                      onPressed: () => _startCarpetVacuuming(context, "H"),
+                      onPressed: () => [_startCarpetVacuuming(context, "M", [sweepZone3]), _returnToCharging(context)],
+                    
                     ),
                     _buildActionButton(
                       text: 'Start floor Sweeping',
                       emoji: '👾🧹',
-                      onPressed: () => _startFloorSweeping(context),
+                      onPressed: () => [_startFloorSweeping(context),_returnToCharging(context)],
                     ),
                     _buildActionButton(
                       text: 'Marble wet mopping',
                       emoji: '😳🧹',
-                      onPressed: () => _startMarbleMopping(context),
+                      onPressed: () => [_startMarbleMopping(context),_returnToCharging(context)],
                     ),
                     _buildActionButton(
                       text: 'Cancel Cleaning',

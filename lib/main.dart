@@ -23,9 +23,10 @@ class _HomePageState extends State<HomePage> {
   String? selectedIp; // 初始无选中
   final List<String> ipList = [
     '', // 空选项
-    '10.1.16.118',
-    '10.1.17.101',
-    '10.1.17.240',
+    '172.20.24.2',
+    '172.20.24.3',
+    '172.20.24.5',
+    '192.168.10.10'
   ];
 
   @override
@@ -39,7 +40,7 @@ class _HomePageState extends State<HomePage> {
         final topHeight = constraints.maxHeight * 0.25;
         final buttonTextSize = constraints.maxHeight * 0.04;
         final actualButtonTextSize =
-            isPortrait ? buttonTextSize * 0.8 : buttonTextSize;
+            isPortrait ? buttonTextSize * 0.65 : buttonTextSize;
 
         return Scaffold(
           body: Column(
@@ -144,14 +145,14 @@ class _HomePageState extends State<HomePage> {
       case 'Summon':
         onPressed = () {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => SummonPage()),
+            MaterialPageRoute(builder: (_) => SummonPage(newIp: selectedIp)),
           );
         };
         break;
       case 'Functions':
         onPressed = () {
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => FunctionsPage()),
+            MaterialPageRoute(builder: (_) => FunctionsPage(newIp: selectedIp)),
           );
         };
         break;

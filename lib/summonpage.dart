@@ -1,11 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 class SummonPage extends StatefulWidget {
+  final String? newIp;
   @override
+  const SummonPage({Key? key, required this.newIp}) : super(key: key);
   State<SummonPage> createState() => _SummonPageState();
 }
 
 class _SummonPageState extends State<SummonPage> {
   String? selectedPoint; // 初始无选中
+  String? selectedIp; // 初始无选中
+
+  final List<String> ipList = [
+    '', // 空选项
+    '172.20.24.2',
+    '172.20.24.3',
+    '172.20.24.5',
+  ];
+
+  void resetSelections() {
+    setState(() {
+      selectedIp = null;
+      selectedPoint = null;
+    });
+  }
+
   final List<String> arrivePoints = [
     '', // 空选项
     'arrive_point_1',
@@ -15,9 +34,11 @@ class _SummonPageState extends State<SummonPage> {
     'arrive_point_5',
   ];
 
+
   @override
   Widget build(BuildContext context) {
     final Color commonWhite = Colors.white;
+    String? newIp = widget.newIp; 
 
     return Scaffold(
       appBar: AppBar(
@@ -80,7 +101,18 @@ class _SummonPageState extends State<SummonPage> {
                         }).toList(),
                         onChanged: (String? newValue) {
                           setState(() {
+                            print("changed");
+                        
                             selectedPoint = newValue;
+                            String apiUrl = "http://$newIp/api/move?marker=$selectedPoint";
+                            print(apiUrl);
+                            try {
+                            // Using http.get as specified in the documentation
+                            final response = http.post(
+                            Uri.parse(apiUrl),
+                            );}catch(e){
+                              print("fail");
+                            }
                           });
                         },
                       ),
