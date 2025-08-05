@@ -230,10 +230,11 @@ class _FunctionsPageState extends State<FunctionsPage> {
     "zoneName": "1F_testing_2",
     "zoneType": "SWEEP",
   };
-
-
+    var zones = [["1F_Frontlobby2","1F_GuestRoom","1F_Lobby","1F_FrontMeetingRoom","1F_FrontGuestRoom","1F_Frontlobby"], ["2F_guestroom"], ["3F_guestroom"], ["4F_guestroom"],["5F_guestroom"], ["6F_guestroom"],["7F_guestrooom"],["8F_guestroom"],["9F_guestroom"],["10F_guestroom"]];
+    
   // FIX: Added 'async' and corrected hardness parameter usage
   void _startCarpetVacuuming(BuildContext context, String hardness, List sweepZones) async {
+    
     const int port = 18080;
     const String path = '/api/v1/task/flow';
     final String apiUrl = 'http://$_robotIpAddress:$port$path';
@@ -242,6 +243,48 @@ class _FunctionsPageState extends State<FunctionsPage> {
     final String clientToken = _uuid.v4().replaceAll('-', '');
     final String timestamp = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now().toUtc());
 
+    var url = Uri.parse('http://$_robotIpAddress:9001/api/robot_status');
+    var zone_list=[];
+    try {
+        var response = await http.get(url);
+
+        if (response.statusCode == 200) {
+        // The request was successful, and the server sent back a response.
+      
+
+        // If you expect a JSON response, you can decode it like this:
+        var decodedData = jsonDecode(response.body);
+        int currentFloor = decodedData['results']['current_floor'];
+        
+        for (var zonename in zones[currentFloor-1]) {
+             final Map<String, dynamic> sweepZone3 = {
+            "coordinates": [
+            {"x": "5.29", "y": "4.07"},
+            {"x": "5.39", "y": "-3.03"},
+            {"x": "11.05", "y": "-2.95"},
+            {"x": "10.95", "y": "4.19"},
+            ],
+            "creator": "WTHT08E0390415704",
+            "dirtyImgUrls": [],
+            "floor": 1,
+            "id": "20240514040328107630247857670631",
+            "label": "",
+            "level": 0,
+            "material": "carpet",
+            "probability": "",
+            "zoneName": zonename,
+            "zoneType": "SWEEP",
+            };
+            zone_list.add(sweepZone3);
+        }
+        } else {
+        // The request failed with a non-200 status code.
+        print('Request failed with status: ${response.statusCode}.');
+        }
+    } catch (e) {
+        // An error occurred during the request.
+        print('Error caught: $e');
+    }
 
     final Map<String, dynamic> executorObject = {
       "optionId": "1002",
@@ -254,7 +297,7 @@ class _FunctionsPageState extends State<FunctionsPage> {
         },
         "hcp": 2,
         "hardness": hardness, // FIX: Changed 'L' to use the 'hardness' parameter
-        "zones": sweepZones,
+        "zones": zone_list,
       }
     };
 
