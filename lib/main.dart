@@ -29,12 +29,14 @@ class _HomePageState extends State<HomePage> {
   final UpdateService _updateService = UpdateService();
   @override
   void initState() {
+    
     super.initState();
-    // Check for updates when the app starts (optional)
-    // Add a delay if you don't want it immediately on startup
+   
     Future.delayed(Duration(seconds: 2), () {
+     
       if (mounted) { // Ensure widget is still in the tree
-         _updateService.checkForUpdate(context);
+        
+        _updateService.checkForUpdate(context);
       }
     });
   }
