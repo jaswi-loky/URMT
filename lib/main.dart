@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+
+import 'update.dart'; 
+
+
 import 'dart:math';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+void main() => runApp(MyApp());
 
-void main() => runApp(const MyApp());
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -35,6 +40,20 @@ class _HomePageState extends State<HomePage> {
     '10.1.17.101',
     '10.1.17.240',
   ];
+  final UpdateService _updateService = UpdateService();
+  @override
+  void initState() {
+    
+    super.initState();
+   
+    Future.delayed(Duration(seconds: 2), () {
+     
+      if (mounted) { // Ensure widget is still in the tree
+        
+        _updateService.checkForUpdate(context);
+      }
+    });
+  }
 
   void resetSelections() {
     setState(() {
