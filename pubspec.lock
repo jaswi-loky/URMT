@@ -131,11 +131,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+
   flutter_web_plugins:
     dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.0"
+
+
   http:
     dependency: "direct main"
     description:
@@ -144,6 +147,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+
   http_parser:
     dependency: transitive
     description:
@@ -529,6 +533,7 @@ packages:
     dependency: transitive
     description:
       name: web
+
       sha256: "4188706108906f002b3a293509234588823c8c979dc83304e229ff400c996b05"
       url: "https://pub.dev"
     source: hosted
@@ -549,6 +554,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+
   xml:
     dependency: transitive
     description:

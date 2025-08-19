@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
     <!-- All intent filters MUST be inside this single <queries> block -->
     <queries>
         <!-- For package visibility to open the "Install unknown apps" settings page -->
@@ -18,9 +19,11 @@
             <data android:mimeType="text/plain"/>
         </intent>
     </queries>
+
+    
+
     <application
         android:label="URMT"
-        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
