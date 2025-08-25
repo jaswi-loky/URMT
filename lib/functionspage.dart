@@ -14,10 +14,11 @@ class _FunctionsPageState extends State<FunctionsPage> {
 
   bool _showSetLocationSection = false;
   String? _selectedMap = 'map_1';
-  final List<String> _mapOptions = ['map_1', 'map_2', 'map_3', 'map_4','map_5'];
-
-  final String _robotIpAddress = '10.1.17.101';
+  final List<String> _mapOptions = ['map_1', 'map_2', 'map_3', 'map_4','map_5', 'map_6', 'map_7', 'map_8', 'map_9', 'map_10', "map_11"];
+  
   final Uuid _uuid = Uuid();
+  final String currentFloor = "1";
+  String upper = "";
 
   // --- 1. Reusable API Helper Function ---
   /// Makes a generic POST request to the robot.
@@ -31,7 +32,8 @@ class _FunctionsPageState extends State<FunctionsPage> {
     String? successMessage,
     String? failureMessage,
   }) async {
-    final String apiUrl = 'http://$_robotIpAddress:$port$path';
+    String? robotIpAddress = widget.newIp;
+    final String apiUrl = 'http://$robotIpAddress:$port$path';
     print('Calling API: $apiUrl');
 
     try {
@@ -57,9 +59,10 @@ class _FunctionsPageState extends State<FunctionsPage> {
 
     void _switchChassisPosition(BuildContext context, String marker) async {
     const int port = 9001;
+    String? robotIpAddress = widget.newIp;
     final String path = '/api/position_adjust?marker=$marker';
-    final String apiUrl = 'http://$_robotIpAddress:$port$path';
-
+    final String apiUrl = 'http://$robotIpAddress:$port$path';
+    //final String currentFloor;
 
     try {
       // Using http.get as specified in the documentation
@@ -98,12 +101,42 @@ class _FunctionsPageState extends State<FunctionsPage> {
   void _attachChassis(BuildContext context) async {
     const int port = 18080;
     const String path = '/api/v1/task/flow';
-    final String apiUrl = 'http://$_robotIpAddress:$port$path';
+    String? robotIpAddress = widget.newIp;
+    final String apiUrl = 'http://$robotIpAddress:$port$path';
 
     final String taskId = DateTime.now().millisecondsSinceEpoch.toString();
     final String timestamp = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now().toUtc());
+    String scqSn = "";
 
-    const String scqSn = "SCQS00G13C0100349";
+    var url = Uri.parse('http://$robotIpAddress:9001/api/robot_status');
+
+    try{
+      var response1 = await http.get(url);
+      var decodedData = jsonDecode(response1.body);
+      int currentFloor = decodedData['results']['current_floor'];
+      final response = await http.get(
+          Uri.parse("http://$robotIpAddress:9001/api/markers/query_list?floor=$currentFloor"),
+          headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        );
+      final Map<String, dynamic> decoded = jsonDecode(response.body);
+      final Map<String, dynamic> results = decoded['results'];
+      List<String> keys = results.keys.toList();
+      for (String marker in keys){
+        String firstSix = marker.length >= 6 ? marker.substring(0, 6) : marker;
+        if (firstSix =="charge"){
+          Map<String, dynamic> properties =  jsonDecode(results[marker]['properties']);
+          if(properties['charging_pile_type'] == 'sweep_charging_pile'){
+            scqSn = properties['cabin_key'];
+          }
+        } 
+      }
+
+    }catch(e){
+    }
+    //const String scqSn = "SCQS00G0450101020";
+    //const String scqSn = "SCQS00G13C0100349";
     const String movePoint = "waiting";
 
     final Map<String, dynamic> optionDocking = {
@@ -139,7 +172,8 @@ class _FunctionsPageState extends State<FunctionsPage> {
     final String executorsJsonString = jsonEncode(executorsList);
 
     final Map<String, dynamic> requestData = {
-      "cabinKey": "SCQS00G13C0100349",
+      "cabinKey": scqSn,
+      //"cabinKey": "SCQS00G13C0100349",
       "cabinDeviceType": 456,
       "taskType": 0,
       "clientToken": "41f04677025c4808a1df84138eb6e53e",
@@ -172,82 +206,63 @@ class _FunctionsPageState extends State<FunctionsPage> {
       print('Network Error for docking task: $e');
       _showFeedback(context, 'Network Error: Could not connect to the robot.', Colors.red);
     }
+    upper = scqSn;
+  }
+  
+  var zones = [];
+
+  List<List<String>> groupByFloor(var data) {
+  // Group by floor number
+  Map<int, List<String>> grouped = {};
+
+  for (var item in data) {
+    String name = item["name"] ?? "";
+    int floor = int.parse(name.split("F")[0]); // Extract floor number
+
+    grouped.putIfAbsent(floor, () => []);
+    grouped[floor]!.add(name);
   }
 
-  final Map<String, dynamic> sweepZone1 = {
-    "coordinates": [
-      {"x": "0.81", "y": "-9.59"},
-      {"x": "0.69", "y": "-13.43"},
-      {"x": "4.62", "y": "-13.58"},
-      {"x": "4.74", "y": "-9.8"},
-    ],
-    "creator": "WTHT08E0390415704",
-    "dirtyImgUrls": [],
-    "floor": 1,
-    "id": "20240514040328107630247857670629",
-    "label": "",
-    "level": 1,
-    "material": "marble",
-    "probability": "",
-    "zoneName": "1F_test2",
-    "zoneType": "SWEEP",
-  };
+  // Create a fixed list of 15 sublists
+  return List.generate(
+    15,
+    (i) => grouped[i + 1] ?? [],
+  );
+}
 
-    final Map<String, dynamic> sweepZone2 = {
-    "coordinates": [
-      {"x": "0.57", "y": "-1.46"},
-      {"x": "0.09", "y": "-9.14"},
-      {"x": "3.12", "y": "-9.29"},
-      {"x": "3.57", "y": "-1.64"},
-    ],
-    "creator": "WTHT08E0390415704",
-    "dirtyImgUrls": [],
-    "floor": 1,
-    "id": "20240514040328107630247857670630",
-    "label": "",
-    "level": 1,
-    "material": "marble",
-    "probability": "",
-    "zoneName": "1F_testing_1",
-    "zoneType": "SWEEP",
-  };
-
-    final Map<String, dynamic> sweepZone3 = {
-    "coordinates": [
-      {"x": "5.29", "y": "4.07"},
-      {"x": "5.39", "y": "-3.03"},
-      {"x": "11.05", "y": "-2.95"},
-      {"x": "10.95", "y": "4.19"},
-    ],
-    "creator": "WTHT08E0390415704",
-    "dirtyImgUrls": [],
-    "floor": 1,
-    "id": "20240514040328107630247857670631",
-    "label": "",
-    "level": 0,
-    "material": "carpet",
-    "probability": "",
-    "zoneName": "1F_testing_2",
-    "zoneType": "SWEEP",
-  };
-    var zones = [["1F_Frontlobby2","1F_GuestRoom","1F_Lobby","1F_FrontMeetingRoom","1F_FrontGuestRoom","1F_Frontlobby"], ["2F_guestroom"], ["3F_guestroom"], ["4F_guestroom"],["5F_guestroom"], ["6F_guestroom"],["7F_guestrooom"],["8F_guestroom"],["9F_guestroom"],["10F_guestroom"]];
+String _getMaterial(String zone){
+  String type;
+  if (zone.endsWith('c') || zone.endsWith('C')) {
+  type = "carpet";
+} else if (zone.endsWith('m')|| zone.endsWith('M')){
+  type = "marble";
+}
+  else{
+    type = "none";
+  }
+  return type;
+}
     
   // FIX: Added 'async' and corrected hardness parameter usage
-  void _startCarpetVacuuming(BuildContext context, String hardness, List sweepZones) async {
+  void _startCarpetVacuuming(BuildContext context, String hardness) async {
     
     const int port = 18080;
     const String path = '/api/v1/task/flow';
-    final String apiUrl = 'http://$_robotIpAddress:$port$path';
+    String? robotIpAddress = widget.newIp;
+    final String apiUrl = 'http://$robotIpAddress:$port$path';
 
     final String taskId = _uuid.v4();
     final String clientToken = _uuid.v4().replaceAll('-', '');
     final String timestamp = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now().toUtc());
 
-    var url = Uri.parse('http://$_robotIpAddress:9001/api/robot_status');
+    var url = Uri.parse('http://$robotIpAddress:9001/api/robot_status');
     var zone_list=[];
+    var newurl = Uri.parse('http://$robotIpAddress:9001/api/robot_info');
+    var zoneurl = Uri.parse('http://$robotIpAddress:18080/api/marker/area/list');
     try {
         var response = await http.get(url);
-
+        var response2 = await http.get(newurl);
+        var response3 = await http.get(zoneurl);
         if (response.statusCode == 200) {
         // The request was successful, and the server sent back a response.
       
@@ -255,27 +270,40 @@ class _FunctionsPageState extends State<FunctionsPage> {
         // If you expect a JSON response, you can decode it like this:
         var decodedData = jsonDecode(response.body);
         int currentFloor = decodedData['results']['current_floor'];
-        
+        var decodedData1 = jsonDecode(response2.body);
+        String robotid = decodedData1['results']['product_id'];
+        var decodedData2 = jsonDecode(response3.body);
+        var data = decodedData2['data'];
+        print(data);
+        zones  = groupByFloor(data);
+        print(zones);
+        //zones = [["1F_testing_1", "1F_test2"], ["2F_hallway", "2F_"]];
+        String material;
+
         for (var zonename in zones[currentFloor-1]) {
-             final Map<String, dynamic> sweepZone3 = {
+            //material = _getMaterial(zonename);
+            //if (material == "carpet"){
+            final Map<String, dynamic> sweepZone3 = {
             "coordinates": [
-            {"x": "5.29", "y": "4.07"},
+            /*{"x": "5.29", "y": "4.07"},
             {"x": "5.39", "y": "-3.03"},
             {"x": "11.05", "y": "-2.95"},
             {"x": "10.95", "y": "4.19"},
-            ],
-            "creator": "WTHT08E0390415704",
+            */],
+            "creator": robotid,
             "dirtyImgUrls": [],
-            "floor": 1,
+            "floor": currentFloor,
             "id": "20240514040328107630247857670631",
             "label": "",
             "level": 0,
+            //"material": material,
             "material": "carpet",
             "probability": "",
             "zoneName": zonename,
             "zoneType": "SWEEP",
             };
             zone_list.add(sweepZone3);
+            //}
         }
         } else {
         // The request failed with a non-200 status code.
@@ -285,12 +313,12 @@ class _FunctionsPageState extends State<FunctionsPage> {
         // An error occurred during the request.
         print('Error caught: $e');
     }
-
     final Map<String, dynamic> executorObject = {
       "optionId": "1002",
       "executionId": "sweep",
       "params": {
-        "cabinKey": "SCQS00G13C0100349",
+        //"cabinKey": "SCQS00G13C0100349",
+        "cabinKey": upper,
         "attach": {
           "storeId": "202412209218662201730709785088",
           "taskId": ["{taskId}"],
@@ -304,7 +332,8 @@ class _FunctionsPageState extends State<FunctionsPage> {
     final String executorsJsonString = jsonEncode([executorObject]); // FIX: executorObject should be in a list
 
     final Map<String, dynamic> requestData = {
-      "cabinKey": "SCQS00G13C0100349",
+      "cabinKey": upper,
+      //"cabinKey": "SCQS00G13C0100349",
       "cabinDeviceType": 456,
       "taskType": 0,
       "clientToken": clientToken,
@@ -339,13 +368,248 @@ class _FunctionsPageState extends State<FunctionsPage> {
   }
 
   // FIX: Added BuildContext parameter
-  void _startFloorSweeping(BuildContext context) {
-    _startCarpetVacuuming(context, "H", [sweepZone1, sweepZone2]);
+  void _startFloorSweeping(BuildContext context, String hardness) async{
+   
+    const int port = 18080;
+    const String path = '/api/v1/task/flow';
+    String? robotIpAddress = widget.newIp;
+    final String apiUrl = 'http://$robotIpAddress:$port$path';
+
+    final String taskId = _uuid.v4();
+    final String clientToken = _uuid.v4().replaceAll('-', '');
+    final String timestamp = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now().toUtc());
+
+    var url = Uri.parse('http://$robotIpAddress:9001/api/robot_status');
+    var zone_list=[];
+    var newurl = Uri.parse('http://$robotIpAddress:9001/api/robot_info');
+    var zoneurl = Uri.parse('http://$robotIpAddress:18080/api/marker/area/list');
+    try {
+        var response = await http.get(url);
+        var response2 = await http.get(newurl);
+        var response3 = await http.get(zoneurl);
+
+        if (response.statusCode == 200) {
+        // The request was successful, and the server sent back a response.
+      
+
+        // If you expect a JSON response, you can decode it like this:
+        var decodedData = jsonDecode(response.body);
+        int currentFloor = decodedData['results']['current_floor'];
+        var decodedData1 = jsonDecode(response2.body);
+        String robotid = decodedData1['results']['product_id'];
+        var decodedData2 = jsonDecode(response3.body);
+        print(decodedData2["data"]);
+        var data = decodedData2["data"];
+        zones  = groupByFloor(data);
+        String material;
+        //zones = [["1F_testing_1", "1F_test2"], ["2F_hallway", "2F_"]];
+        for (var zonename in zones[currentFloor-1]) {
+          //material = _getMaterial(zonename);
+          //if (material == "marble"){
+            final Map<String, dynamic> sweepZone3 = {
+            "coordinates": [
+            /*{"x": "5.29", "y": "4.07"},
+            {"x": "5.39", "y": "-3.03"},
+            {"x": "11.05", "y": "-2.95"},
+            {"x": "10.95", "y": "4.19"},
+            */],
+            "creator": robotid,
+            "dirtyImgUrls": [],
+            "floor": currentFloor,
+            "id": "20240514040328107630247857670631",
+            "label": "",
+            "level": 0,
+            //"material": material,
+            "material": "carpet",
+            "probability": "",
+            "zoneName": zonename,
+            "zoneType": "SWEEP",
+            };
+            zone_list.add(sweepZone3);
+            //}
+          
+        }
+        } else {
+        // The request failed with a non-200 status code.
+        print('Request failed with status: ${response.statusCode}.');
+        }
+    } catch (e) {
+        // An error occurred during the request.
+        print('Error caught: $e');
+    }
+    final Map<String, dynamic> executorObject = {
+      "optionId": "1002",
+      "executionId": "sweep",
+      "params": {
+        //"cabinKey": "SCQS00G13C0100349",
+        "cabinKey": upper,
+        "attach": {
+          "storeId": "202412209218662201730709785088",
+          "taskId": ["{taskId}"],
+        },
+        "hcp": 2,
+        "hardness": hardness, // FIX: Changed 'L' to use the 'hardness' parameter
+        "zones": zone_list,
+      }
+    };
+
+    final String executorsJsonString = jsonEncode([executorObject]); // FIX: executorObject should be in a list
+
+    final Map<String, dynamic> requestData = {
+      "cabinKey": upper,
+      //"cabinKey": "SCQS00G13C0100349",
+      "cabinDeviceType": 456,
+      "taskType": 0,
+      "clientToken": clientToken,
+      "executors": executorsJsonString,
+      "forceCancel": false,
+      "taskId": taskId,
+      "versionNumber": "1",
+      "timestamp": timestamp,
+    };
+
+    print('Calling API: $apiUrl');
+    print('Request Body: ${jsonEncode(requestData)}');
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode(requestData),
+      );
+
+      if (response.statusCode == 200) {
+        print('Task Flow Started Successfully: ${response.body}');
+        _showFeedback(context, 'Task flow started!', Colors.green);
+      } else {
+        print('API Error for task flow: Status ${response.statusCode}');
+        _showFeedback(context, 'Failed to start task flow: Error ${response.statusCode}', Colors.red);
+      }
+    } catch (e) {
+      print('Network Error for task flow: $e');
+      _showFeedback(context, 'Network Error: Could not connect to the robot.', Colors.red);
+    }
   }
 
   // FIX: Added BuildContext parameter
-  void _startMarbleMopping(BuildContext context) {
-    _startCarpetVacuuming(context, "S", [sweepZone2, sweepZone1]); // FIX: Added semicolon
+  void _startMarbleMopping(BuildContext context, String hardness) async{
+    
+    const int port = 18080;
+    const String path = '/api/v1/task/flow';
+    String? robotIpAddress = widget.newIp;
+    final String apiUrl = 'http://$robotIpAddress:$port$path';
+
+    final String taskId = _uuid.v4();
+    final String clientToken = _uuid.v4().replaceAll('-', '');
+    final String timestamp = DateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(DateTime.now().toUtc());
+
+    var url = Uri.parse('http://$robotIpAddress:9001/api/robot_status');
+    var zone_list=[];
+    var newurl = Uri.parse('http://$robotIpAddress:9001/api/robot_info');
+    var zoneurl = Uri.parse('http://$robotIpAddress:18080/api/marker/area/list');
+    try {
+        var response = await http.get(url);
+        var response2 = await http.get(newurl);
+        var response3 = await http.get(zoneurl);
+        if (response.statusCode == 200) {
+        // The request was successful, and the server sent back a response.
+      
+
+        // If you expect a JSON response, you can decode it like this:
+        var decodedData = jsonDecode(response.body);
+        int currentFloor = decodedData['results']['current_floor'];
+        var decodedData1 = jsonDecode(response2.body);
+        String robotid = decodedData1['results']['product_id'];
+        var decodedData2 = jsonDecode(response3.body);
+        var data = decodedData2["data"];
+        zones  = groupByFloor(data);
+        String material;
+        //zones = [["1F_testing_1", "1F_test2"], ["2F_hallway", "2F_"]];
+        for (var zonename in zones[currentFloor-1]) {
+          //material = _getMaterial(zonename);
+          //if (material == "marble"){
+            final Map<String, dynamic> sweepZone3 = {
+            "coordinates": [
+            /*{"x": "5.29", "y": "4.07"},
+            {"x": "5.39", "y": "-3.03"},
+            {"x": "11.05", "y": "-2.95"},
+            {"x": "10.95", "y": "4.19"},
+            */],
+            "creator": robotid,
+            "dirtyImgUrls": [],
+            "floor": currentFloor,
+            "id": "20240514040328107630247857670631",
+            "label": "",
+            "level": 0,
+            //"material": material,
+            "material": "carpet",
+            "probability": "",
+            "zoneName": zonename,
+            "zoneType": "SWEEP",
+            };
+            zone_list.add(sweepZone3);
+           //}
+        }
+        } else {
+        // The request failed with a non-200 status code.
+        print('Request failed with status: ${response.statusCode}.');
+        }
+    } catch (e) {
+        // An error occurred during the request.
+        print('Error caught: $e');
+    }
+    final Map<String, dynamic> executorObject = {
+      "optionId": "1002",
+      "executionId": "sweep",
+      "params": {
+        //"cabinKey": "SCQS00G13C0100349",
+        "cabinKey": upper,
+        "attach": {
+          "storeId": "202412209218662201730709785088",
+          "taskId": ["{taskId}"],
+        },
+        "hcp": 2,
+        "hardness": hardness, // FIX: Changed 'L' to use the 'hardness' parameter
+        "zones": zone_list,
+      }
+    };
+
+    final String executorsJsonString = jsonEncode([executorObject]); // FIX: executorObject should be in a list
+
+    final Map<String, dynamic> requestData = {
+      "cabinKey": upper,
+      //"cabinKey": "SCQS00G13C0100349",
+      "cabinDeviceType": 456,
+      "taskType": 0,
+      "clientToken": clientToken,
+      "executors": executorsJsonString,
+      "forceCancel": false,
+      "taskId": taskId,
+      "versionNumber": "1",
+      "timestamp": timestamp,
+    };
+
+    print('Calling API: $apiUrl');
+    print('Request Body: ${jsonEncode(requestData)}');
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode(requestData),
+      );
+
+      if (response.statusCode == 200) {
+        print('Task Flow Started Successfully: ${response.body}');
+        _showFeedback(context, 'Task flow started!', Colors.green);
+      } else {
+        print('API Error for task flow: Status ${response.statusCode}');
+        _showFeedback(context, 'Failed to start task flow: Error ${response.statusCode}', Colors.red);
+      }
+    } catch (e) {
+      print('Network Error for task flow: $e');
+      _showFeedback(context, 'Network Error: Could not connect to the robot.', Colors.red);
+    }
   }
 
   void _cancelCleaning(BuildContext context) {
@@ -419,18 +683,18 @@ class _FunctionsPageState extends State<FunctionsPage> {
                     _buildActionButton(
                       text: 'Start Carpet Vacuuming',
                       emoji: '👾🧹',
-                      onPressed: () => [_startCarpetVacuuming(context, "M", [sweepZone3]), _returnToCharging(context)],
+                      onPressed: () => [_startCarpetVacuuming(context, "M")],
                     
                     ),
                     _buildActionButton(
                       text: 'Start floor Sweeping',
                       emoji: '👾🧹',
-                      onPressed: () => [_startFloorSweeping(context),_returnToCharging(context)],
+                      onPressed: () => [_startFloorSweeping(context, "S")],
                     ),
                     _buildActionButton(
                       text: 'Marble wet mopping',
                       emoji: '😳🧹',
-                      onPressed: () => [_startMarbleMopping(context),_returnToCharging(context)],
+                      onPressed: () => [_startMarbleMopping(context, "L")],
                     ),
                     _buildActionButton(
                       text: 'Cancel Cleaning',
@@ -618,35 +882,3 @@ class _FunctionsPageState extends State<FunctionsPage> {
   }
 }
 
-  // FIX: Added 'Widget' return type
-  Widget _buildActionButton({
-    required String text,
-    required VoidCallback onPressed,
-    String? emoji,
-  }) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blueAccent,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        elevation: 2,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (emoji != null) ...[
-            Text(
-              emoji,
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(width: 8),
-          ],
-          Text(text),
-        ],
-      ),
-    );
-  }
