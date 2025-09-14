@@ -3,28 +3,38 @@ import 'functionspage.dart';
 import 'summonpage.dart';
 import 'subsite.dart';
 import 'secondsite.dart';
+import 'update.dart'; 
+import 'dart:math';
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'URMT',
-      home: HomePage(),
+      home: const HomePage(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
 class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   String? selectedIp; // 初始无选中
+  String? selectedPoint;
+  final TextEditingController _controller = TextEditingController();
   final List<String> ipList = [
-    '', // 空选项
+    '',
+    '192.168.51.2-SJC',
     '172.20.24.3-Ontario',
     '172.20.24.5-Ontario',
     '192.168.200.146-NY',
@@ -32,6 +42,35 @@ class _HomePageState extends State<HomePage> {
     '192.168.10.10-Connect to Robot',
     '10.1.17.101-Qbay',
   ];
+
+    final UpdateService _updateService = UpdateService();
+  @override
+  void initState() {
+    
+    super.initState();
+    _loadLastIp();
+    Future.delayed(Duration(seconds: 2), () {
+     
+      if (mounted) { // Ensure widget is still in the tree
+        
+        _updateService.checkForUpdate(context);
+      }
+    });
+  }
+
+  Future<void> _loadLastIp() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastIp = prefs.getString('last_ip') ?? '';
+    setState(() {
+      _controller.text = lastIp;
+    });
+    selectedIp = lastIp;
+  }
+  
+  Future<void> _saveLastIp(String ip) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('last_ip', ip);
+  }
 
   String? newIP;
 
@@ -44,7 +83,9 @@ class _HomePageState extends State<HomePage> {
         final isPortrait =
             MediaQuery.of(context).orientation == Orientation.portrait;
         final topHeight = constraints.maxHeight * 0.25;
-        final buttonTextSize = constraints.maxHeight * 0.04;
+        final scale = MediaQuery.of(context).textScaler;
+        final basebuttonTextSize = constraints.maxHeight * 0.04;
+        final buttonTextSize = scale.scale(basebuttonTextSize);
         final actualButtonTextSize =
             isPortrait ? buttonTextSize * 0.65 : buttonTextSize;
 
@@ -111,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                           itemHeight: 57.6,
                           items: ipList.map((String value) {
                             return DropdownMenuItem<String>(
-                              value: value.isEmpty ? null : value,
+                              value: value,/*.isEmpty ? null : value,*/
                               child: Text(
                                 value,
                                 style: TextStyle(
@@ -128,6 +169,8 @@ class _HomePageState extends State<HomePage> {
                               : (newValue ?? '');
                               newIP = beforeDash;
                               selectedIp = newValue;
+                              String ip = selectedIp ?? "";
+                              _saveLastIp(ip);
                             });
                           },
                         ),
@@ -152,6 +195,10 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildButton(String label, double fontSize, BuildContext context) {
     VoidCallback? onPressed;
+    String beforeDash = (selectedIp?.contains('-') ?? false)
+        ? selectedIp!.split('-').first
+        : (selectedIp ?? '');
+        newIP = beforeDash;
     switch (label) {
       case 'Summon':
         onPressed = () {

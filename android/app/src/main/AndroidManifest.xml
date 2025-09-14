@@ -1,7 +1,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+        <!-- All intent filters MUST be inside this single <queries> block -->
+    <queries>
+        <!-- For package visibility to open the "Install unknown apps" settings page -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="package" />
+        </intent>
+
+        <!-- Often included for managing storage, good to have -->
+        <intent>
+            <action android:name="android.intent.action.MANAGE_PACKAGE_STORAGE" />
+        </intent>
+
+        <!-- The original query for Flutter's text processing plugin -->
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+    </queries>
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="URMT"
-        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
         <activity
@@ -37,10 +56,4 @@
          https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.PROCESS_TEXT"/>
-            <data android:mimeType="text/plain"/>
-        </intent>
-    </queries>
 </manifest>

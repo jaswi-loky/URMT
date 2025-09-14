@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -14,12 +15,36 @@ class _FunctionsPageState extends State<FunctionsPage> {
 
   bool _showSetLocationSection = false;
   String? _selectedMap = 'map_1';
-  final List<String> _mapOptions = ['map_1', 'map_2', 'map_3', 'map_4','map_5', 'map_6', 'map_7', 'map_8', 'map_9', 'map_10', "map_11"];
+  final List<String> _mapOptions = [];
   
   final Uuid _uuid = Uuid();
   final String currentFloor = "1";
   String upper = "";
 
+  @override
+  void initState() {
+    super.initState();
+    _findPoints();
+  }
+
+  Future<void> _findPoints() async{
+     String? robotIpAddress = widget.newIp;
+     print(robotIpAddress);
+     try{
+      final response = await http.get(Uri.parse("http://$robotIpAddress:9001/api/markers/query_list"));
+      final Map<String, dynamic> decoded = jsonDecode(response.body);
+      final Map<String, dynamic> results = decoded['results'];
+      List<String> keys = results.keys.toList();
+      for (String marker in keys){
+        String firstFour = marker.length >= 4 ? marker.substring(0, 4) : marker;
+        if (firstFour =="map_"){
+          _mapOptions.add(marker);
+        } 
+      }
+    }catch(e){
+    }
+
+}
   // --- 1. Reusable API Helper Function ---
   /// Makes a generic POST request to the robot.
   ///
@@ -56,6 +81,54 @@ class _FunctionsPageState extends State<FunctionsPage> {
       _showFeedback(context, 'Network Error: Could not connect to the robot.', Colors.red);
     }
   }
+
+  void startPolling() {
+  String? robotIpAddress = widget.newIp;
+  String url = "http://$robotIpAddress:9001/api/robot_status"; // fixed IP
+  var url10 = Uri.parse('http://$robotIpAddress:9001/api/robot_status');
+  Timer? timer;
+  DateTime? idleStartTime;
+
+   timer = Timer.periodic(Duration(seconds: 1), (Timer t) async {
+    try {
+      var response1 = await http.get(url10);
+      var decodedData = jsonDecode(response1.body);
+      int currentFloor = decodedData['results']['current_floor'];
+       var url11 = Uri.parse('http://$robotIpAddress:9001/api/move?marker=map_$currentFloor');
+      final response = await http.get(Uri.parse(url));
+      
+      if (response.statusCode == 200) {
+        final body = response.body.trim();
+
+        if (body.contains("idle")) {
+          // start counting idle duration
+          idleStartTime ??= DateTime.now();
+
+          final elapsed = DateTime.now().difference(idleStartTime!).inSeconds;
+
+          // ✅ check that it is STILL idle after 30 seconds
+          if (elapsed >= 30) {
+            print("Idle for 30 continuous seconds, stopping polling.");
+            if (currentFloor == 1){
+            _returnToCharging(context);
+            }
+            else{
+              http.post(url11);
+            }
+            timer?.cancel();
+          }
+        } else {
+          // reset timer if response is not idle anymore
+          idleStartTime = null;
+        }
+      } else {
+        print("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Request failed: $e");
+    }
+  });
+}
 
     void _switchChassisPosition(BuildContext context, String marker) async {
     const int port = 9001;
@@ -242,7 +315,9 @@ String _getMaterial(String zone){
   }
   return type;
 }
-    
+
+
+
   // FIX: Added 'async' and corrected hardness parameter usage
   void _startCarpetVacuuming(BuildContext context, String hardness) async {
     
@@ -346,7 +421,7 @@ String _getMaterial(String zone){
 
     print('Calling API: $apiUrl');
     print('Request Body: ${jsonEncode(requestData)}');
-
+    startPolling();
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -470,7 +545,7 @@ String _getMaterial(String zone){
 
     print('Calling API: $apiUrl');
     print('Request Body: ${jsonEncode(requestData)}');
-
+    startPolling();
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
@@ -591,7 +666,7 @@ String _getMaterial(String zone){
 
     print('Calling API: $apiUrl');
     print('Request Body: ${jsonEncode(requestData)}');
-
+    startPolling();
     try {
       final response = await http.post(
         Uri.parse(apiUrl),
