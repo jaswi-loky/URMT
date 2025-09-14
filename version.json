@@ -1,0 +1,7 @@
+
+{
+  "versionName": "1.0.0",
+  "versionCode": 1, 
+  "apkUrl": "https://www.your-server.com/releases/app-v2.0.0.apk",
+  "releaseNotes": "- Robot UI"
+}

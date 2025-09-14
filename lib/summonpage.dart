@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'dart:async';
 
 class SummonPage extends StatefulWidget {
   final String? newIp;
@@ -13,6 +14,10 @@ class SummonPage extends StatefulWidget {
 class _SummonPageState extends State<SummonPage> {
   String? selectedPoint; // 初始无选中
   String? selectedIp; // 初始无选中
+  Timer? _timer;
+  int _idleSeconds = 0;
+  bool _isIdle = false;
+  bool _selfReturn = true;
 
   final List<String> ipList = [
     '', // 空选项
@@ -90,6 +95,7 @@ class _SummonPageState extends State<SummonPage> {
       successMessage: 'Robot is returning to charge.',
       failureMessage: 'Failed to send return command.',
     );
+    _selfReturn = false;
   }
 
   void _attachChassis(BuildContext context, String? summon) async {
@@ -213,6 +219,52 @@ class _SummonPageState extends State<SummonPage> {
     );
   }
 
+  void startMonitoring(BuildContext context) {
+  _timer = Timer.periodic(Duration(seconds: 1), (_) async {
+    String? robotIpAddress = widget.newIp;
+    var url = Uri.parse('http://$robotIpAddress:9001/api/robot_status');
+    String status;
+    String target;
+    int time_Limit = 300;
+    try{
+      var response = await http.get(url);
+      var decodedData = jsonDecode(response.body);
+      status = decodedData['results']['running_status'];
+      target = decodedData['results']['move_target'];
+    }catch(e){
+      status = "idle";
+      target = "";
+    }
+
+    if (status == "idle") {
+      _isIdle = true;
+      _idleSeconds++;
+
+      if (_idleSeconds >= time_Limit) {
+        _returnToCharging(context);
+        _reset();
+      }
+    } else if (status == "running" && target.startsWith("charge")) {
+      if (_isIdle && _idleSeconds < time_Limit && _selfReturn) {
+        _cancelCleaning(context);
+        _selfReturn = true;
+      }
+      _reset();
+    } else {
+      _reset();
+    }
+  });
+}
+
+  void stopMonitoring() {
+    _timer?.cancel();
+    _reset();
+  }
+
+  void _reset() {
+    _isIdle = false;
+    _idleSeconds = 0;
+  }
 
 
 
@@ -318,6 +370,7 @@ class _SummonPageState extends State<SummonPage> {
                                 try {
                                   _attachChassis(context, selectedPoint);
                                   print("Sent to $selectedPoint using IP $newIp");
+                                  startMonitoring(context);
                                 } catch (e) {
                                   print("Failed: $e");
                                 }
