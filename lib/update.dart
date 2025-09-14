@@ -49,9 +49,9 @@ class UpdateService {
       bool forceUpdate = true; // Or based on your versionInfo logic
       _showUpdateDialog(context, latestVersionName, releaseNotes, apkUrl, forceUpdate);
     } else {
-      if (showNoUpdateDialog) {
+      /*if (showNoUpdateDialog) {
          _showNoUpdateDialog(context);
-      }
+      }*/
       debugPrint('App is up to date.');
     }
   }
