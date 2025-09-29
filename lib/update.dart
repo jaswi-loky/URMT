@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'updatesupport.dart';
 
 class UpdateService {
   // Configure this URL
@@ -46,7 +47,7 @@ class UpdateService {
     print('Latest version code from server: $latestVersionCode');
 
     if (latestVersionCode > currentVersionCode) {
-      bool forceUpdate = true; // Or based on your versionInfo logic
+      bool forceUpdate = false; // Or based on your versionInfo logic
       _showUpdateDialog(context, latestVersionName, releaseNotes, apkUrl, forceUpdate);
     } else {
       /*if (showNoUpdateDialog) {
@@ -88,11 +89,12 @@ class UpdateService {
                 ),
               TextButton(
                 child: const Text('Update Now'),
-                onPressed: () {
+                onPressed: () async{
                   // The original call to _downloadAndInstallApk is replaced by this.
                   _launchUpdateUrl(apkUrl, context);
                   // We can pop the dialog immediately as the browser will take over.
                   Navigator.of(context).pop();
+                  //await startSafeUpdateDialog(context, apkUrl);
                 },
               ),
             ],

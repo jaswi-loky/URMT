@@ -240,19 +240,29 @@ class _SummonPageState extends State<SummonPage> {
       _isIdle = true;
       _idleSeconds++;
 
-      if (_idleSeconds >= time_Limit) {
-        _returnToCharging(context);
-        _reset();
-      }
-    } else if (status == "running" && target.startsWith("charge")) {
-      if (_isIdle && _idleSeconds < time_Limit && _selfReturn) {
-        _cancelCleaning(context);
-        _selfReturn = true;
-      }
-      _reset();
-    } else {
+    if (_idleSeconds >= time_Limit) {
+    // Force return after idle timeout
+      _returnToCharging(context);
       _reset();
     }
+    } else if (status == "running" && target.startsWith("charge")) {
+    if (_isIdle) {
+      if (_idleSeconds < time_Limit) {
+      // Robot tries to return early, cancel it
+        if (_selfReturn) {
+          _cancelCleaning(context);
+          _selfReturn = false; // reset self-return flag
+        }
+      } else {
+        // Allow self-return after timeout
+        _selfReturn = true;
+      }
+    }
+    _reset();
+  } else {
+  // Any other activity → reset idle timer
+    _reset();
+  }
   });
 }
 

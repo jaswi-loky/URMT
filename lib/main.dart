@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> {
         final basebuttonTextSize = constraints.maxHeight * 0.04;
         final buttonTextSize = scale.scale(basebuttonTextSize);
         final actualButtonTextSize =
-            isPortrait ? buttonTextSize * 0.65 : buttonTextSize;
+            isPortrait ? buttonTextSize * 0.6 : buttonTextSize;
 
         return Scaffold(
           body: Column(
