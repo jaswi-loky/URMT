@@ -1,8 +1,15 @@
 <<<<<<< Updated upstream
+<<<<<<< HEAD
 <?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@drawable/app_logo"/>
     <foreground android:drawable="@drawable/app_logo"/>
+=======
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/app_logo"/>
+    <foreground android:drawable="@drawable/app_logo"/>
+>>>>>>> ceba4094252f63e8a9f9885bb4af7a9778d86f35
 =======
 <?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
