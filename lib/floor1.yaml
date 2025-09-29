@@ -1,0 +1,726 @@
+<<<<<<< Updated upstream
+[
+-{
+"comment": "",
+"date": "2025-03-01 14:54:23",
+"floor": 1,
+"name": "1F_Frontlobby2",
+-"points": [
+-[
+6.73,
+10.56
+],
+-[
+6.16,
+10.02
+],
+-[
+-5.24,
+11.1
+],
+-[
+-6.5,
+11.25
+],
+-[
+-9.98,
+11.82
+],
+-[
+-10.73,
+11.46
+],
+-[
+-10.49,
+11.73
+],
+-[
+-10.88,
+12.45
+],
+-[
+-12.8,
+14.85
+],
+-[
+-14.54,
+13.5
+],
+-[
+-15.47,
+12.75
+],
+-[
+-17.63,
+10.98
+],
+-[
+-15.68,
+8.58
+],
+-[
+-13.76,
+10.26
+],
+-[
+-12.8,
+10.95
+],
+-[
+-12.17,
+10.35
+],
+-[
+-11.81,
+10.8
+],
+-[
+-12.2,
+9.93
+],
+-[
+-11.48,
+9.3
+],
+-[
+-11.57,
+8.82
+],
+-[
+-10.61,
+8.25
+],
+-[
+-10.37,
+8.55
+],
+-[
+-9.23,
+8.07
+],
+-[
+-9.26,
+7.41
+],
+-[
+-5.57,
+7.02
+],
+-[
+0.73,
+6.57
+],
+-[
+4,
+6.66
+],
+-[
+7.87,
+8.28
+],
+-[
+8.11,
+8.01
+],
+-[
+8.47,
+8.31
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_FrontLobby\",\"sweep_type\":\"carpet\",\"watering_level\":\"watering_level_off\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":true,\"zone_direction\":-0.13}",
+"type": "sweep_area"
+},
+-{
+"comment": "",
+"date": "2024-09-13 14:45:44",
+"floor": 1,
+"name": "1F_GuestRoom",
+-"points": [
+-[
+14.65,
+1.74
+],
+-[
+16.09,
+2.94
+],
+-[
+35.14,
+-20.22
+],
+-[
+33.67,
+-21.45
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_GuestRoom\",\"sweep_type\":\"carpet\",\"watering_level\":\"watering_level_off\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":true,\"zone_direction\":-0.89}",
+"type": "sweep_area"
+},
+-{
+"comment": "",
+"date": "2024-09-13 14:49:45",
+"floor": 1,
+"name": "1F_Lobby",
+-"points": [
+-[
+-9.41,
+0.15
+],
+-[
+1.75,
+-1.05
+],
+-[
+0.82,
+-8.61
+],
+-[
+-4.22,
+-12.12
+],
+-[
+-6.62,
+-9.09
+],
+-[
+-7.25,
+-9.54
+],
+-[
+-10.22,
+-6.18
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_Lobby\",\"sweep_type\":\"carpet\",\"watering_level\":\"watering_level_off\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":true,\"zone_direction\":1.65}",
+"type": "sweep_area"
+},
+-{
+"comment": "",
+"date": "2024-09-13 14:51:44",
+"floor": 1,
+"name": "1F_FrontMeetingRoom",
+-"points": [
+-[
+-14,
+-2.61
+],
+-[
+-12.77,
+-1.71
+],
+-[
+-12.5,
+1.59
+],
+-[
+-11.18,
+1.44
+],
+-[
+-10.91,
+6.54
+],
+-[
+-13.85,
+6.78
+],
+-[
+-14.15,
+7.08
+],
+-[
+-14.84,
+7.98
+],
+-[
+-15.08,
+7.8
+],
+-[
+-18.23,
+11.61
+],
+-[
+-18.05,
+11.97
+],
+-[
+-22.85,
+17.88
+],
+-[
+-27.53,
+14.1
+],
+-[
+-24.32,
+9.72
+],
+-[
+-22.37,
+7.23
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_FrontMeetingRoom\",\"sweep_type\":\"carpet\",\"watering_level\":\"watering_level_off\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":true,\"zone_direction\":2.31}",
+"type": "sweep_area"
+},
+-{
+"comment": "",
+"date": "2024-09-13 14:48:20",
+"floor": 1,
+"name": "1F_FrontGuestRoom",
+-"points": [
+-[
+8.86,
+12.51
+],
+-[
+6.76,
+10.62
+],
+-[
+8.5,
+8.25
+],
+-[
+12.22,
+3.66
+],
+-[
+12.94,
+4.17
+],
+-[
+14.65,
+1.86
+],
+-[
+20.95,
+6.93
+],
+-[
+18.07,
+10.29
+],
+-[
+16.24,
+8.94
+],
+-[
+18.34,
+6.48
+],
+-[
+15.4,
+3.99
+],
+-[
+14.41,
+5.19
+],
+-[
+10.99,
+9.39
+],
+-[
+11.5,
+9.75
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_FrontGuestRoom\",\"sweep_type\":\"carpet\",\"watering_level\":\"watering_level_off\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":true,\"zone_direction\":2.62}",
+"type": "sweep_area"
+},
+-{
+"comment": "",
+"date": "2025-03-01 14:50:42",
+"floor": 1,
+"name": "1F_Frontlobby",
+-"points": [
+-[
+-5.09,
+11.16
+],
+-[
+-5.51,
+7.05
+],
+-[
+-6.29,
+-0.15
+],
+-[
+-0.05,
+-0.78
+],
+-[
+1.15,
+10.5
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_FrontLobby\",\"sweep_type\":\"marble\",\"watering_level\":\"watering_level_1\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":false,\"zone_direction\":1.13}",
+"type": "sweep_area"
+}
+=======
+[
+-{
+"comment": "",
+"date": "2025-03-01 14:54:23",
+"floor": 1,
+"name": "1F_Frontlobby2",
+-"points": [
+-[
+6.73,
+10.56
+],
+-[
+6.16,
+10.02
+],
+-[
+-5.24,
+11.1
+],
+-[
+-6.5,
+11.25
+],
+-[
+-9.98,
+11.82
+],
+-[
+-10.73,
+11.46
+],
+-[
+-10.49,
+11.73
+],
+-[
+-10.88,
+12.45
+],
+-[
+-12.8,
+14.85
+],
+-[
+-14.54,
+13.5
+],
+-[
+-15.47,
+12.75
+],
+-[
+-17.63,
+10.98
+],
+-[
+-15.68,
+8.58
+],
+-[
+-13.76,
+10.26
+],
+-[
+-12.8,
+10.95
+],
+-[
+-12.17,
+10.35
+],
+-[
+-11.81,
+10.8
+],
+-[
+-12.2,
+9.93
+],
+-[
+-11.48,
+9.3
+],
+-[
+-11.57,
+8.82
+],
+-[
+-10.61,
+8.25
+],
+-[
+-10.37,
+8.55
+],
+-[
+-9.23,
+8.07
+],
+-[
+-9.26,
+7.41
+],
+-[
+-5.57,
+7.02
+],
+-[
+0.73,
+6.57
+],
+-[
+4,
+6.66
+],
+-[
+7.87,
+8.28
+],
+-[
+8.11,
+8.01
+],
+-[
+8.47,
+8.31
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_FrontLobby\",\"sweep_type\":\"carpet\",\"watering_level\":\"watering_level_off\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":true,\"zone_direction\":-0.13}",
+"type": "sweep_area"
+},
+-{
+"comment": "",
+"date": "2024-09-13 14:45:44",
+"floor": 1,
+"name": "1F_GuestRoom",
+-"points": [
+-[
+14.65,
+1.74
+],
+-[
+16.09,
+2.94
+],
+-[
+35.14,
+-20.22
+],
+-[
+33.67,
+-21.45
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_GuestRoom\",\"sweep_type\":\"carpet\",\"watering_level\":\"watering_level_off\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":true,\"zone_direction\":-0.89}",
+"type": "sweep_area"
+},
+-{
+"comment": "",
+"date": "2024-09-13 14:49:45",
+"floor": 1,
+"name": "1F_Lobby",
+-"points": [
+-[
+-9.41,
+0.15
+],
+-[
+1.75,
+-1.05
+],
+-[
+0.82,
+-8.61
+],
+-[
+-4.22,
+-12.12
+],
+-[
+-6.62,
+-9.09
+],
+-[
+-7.25,
+-9.54
+],
+-[
+-10.22,
+-6.18
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_Lobby\",\"sweep_type\":\"carpet\",\"watering_level\":\"watering_level_off\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":true,\"zone_direction\":1.65}",
+"type": "sweep_area"
+},
+-{
+"comment": "",
+"date": "2024-09-13 14:51:44",
+"floor": 1,
+"name": "1F_FrontMeetingRoom",
+-"points": [
+-[
+-14,
+-2.61
+],
+-[
+-12.77,
+-1.71
+],
+-[
+-12.5,
+1.59
+],
+-[
+-11.18,
+1.44
+],
+-[
+-10.91,
+6.54
+],
+-[
+-13.85,
+6.78
+],
+-[
+-14.15,
+7.08
+],
+-[
+-14.84,
+7.98
+],
+-[
+-15.08,
+7.8
+],
+-[
+-18.23,
+11.61
+],
+-[
+-18.05,
+11.97
+],
+-[
+-22.85,
+17.88
+],
+-[
+-27.53,
+14.1
+],
+-[
+-24.32,
+9.72
+],
+-[
+-22.37,
+7.23
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_FrontMeetingRoom\",\"sweep_type\":\"carpet\",\"watering_level\":\"watering_level_off\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":true,\"zone_direction\":2.31}",
+"type": "sweep_area"
+},
+-{
+"comment": "",
+"date": "2024-09-13 14:48:20",
+"floor": 1,
+"name": "1F_FrontGuestRoom",
+-"points": [
+-[
+8.86,
+12.51
+],
+-[
+6.76,
+10.62
+],
+-[
+8.5,
+8.25
+],
+-[
+12.22,
+3.66
+],
+-[
+12.94,
+4.17
+],
+-[
+14.65,
+1.86
+],
+-[
+20.95,
+6.93
+],
+-[
+18.07,
+10.29
+],
+-[
+16.24,
+8.94
+],
+-[
+18.34,
+6.48
+],
+-[
+15.4,
+3.99
+],
+-[
+14.41,
+5.19
+],
+-[
+10.99,
+9.39
+],
+-[
+11.5,
+9.75
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_FrontGuestRoom\",\"sweep_type\":\"carpet\",\"watering_level\":\"watering_level_off\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":true,\"zone_direction\":2.62}",
+"type": "sweep_area"
+},
+-{
+"comment": "",
+"date": "2025-03-01 14:50:42",
+"floor": 1,
+"name": "1F_Frontlobby",
+-"points": [
+-[
+-5.09,
+11.16
+],
+-[
+-5.51,
+7.05
+],
+-[
+-6.29,
+-0.15
+],
+-[
+-0.05,
+-0.78
+],
+-[
+1.15,
+10.5
+]
+],
+"properties": "{\"start_marker\":\"sweep_start_1F_FrontLobby\",\"sweep_type\":\"marble\",\"watering_level\":\"watering_level_1\",\"edge_clean_mode\":\"close_to_edge\",\"is_boustro_sweep\":true,\"use_area_direction\":false,\"zone_direction\":1.13}",
+"type": "sweep_area"
+}
+>>>>>>> Stashed changes
+]
