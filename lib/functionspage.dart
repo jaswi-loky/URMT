@@ -717,6 +717,40 @@ String _getMaterial(String zone){
     );
   }
 
+  String _addNote(String input){
+  final parts = input.split('_');
+  String? robotIP = widget.newIp;
+  if (parts.length == 2 && robotIP != '172.20.24.14') {
+    final floorNumber = int.tryParse(parts[1]);
+    if (floorNumber != null) {
+      final floorNames = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth', 'Eleventh', 'Twelfth', 'Thirteenth', 'Fourteenth', 'Fifteenth', 'Sixteenth', 'Seventeenth', 'Eighteenth', 'Nineteenth', 'Twentieth', 'Twenty-First', 'Twenty-Second', 'Twenty-Third', 'Twenty-Fourth', 'Twenty-Fifth', 'Twenty-Sixth', 'Twenty-Seventh', 'Twenty-Eighth', 'Twenty-Ninth', 'Thirtieth'];
+      if (floorNumber <= floorNames.length) {
+        return '${floorNames[floorNumber - 1]} floor';
+      }
+    }
+  }
+  else if (robotIP == '172.20.24.14'){
+    final code = parts[1];
+    if (code.length == 2) {
+      final buildingNum = int.tryParse(code[0]);
+      final floorNum = int.tryParse(code[1]);
+
+      final buildingNames = ['Courtyard', 'Residence Inn'];
+      final floorNames = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth'];
+
+      if (buildingNum != null && floorNum != null) {
+        final buildingStr = buildingNames[buildingNum - 1];
+        final floorStr = floorNames[floorNum - 1];
+        return '$floorStr floor $buildingStr';
+      }
+    }
+    else if(code.length == 1){
+      return 'First floor';
+    }
+  }
+  return input;
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -861,7 +895,7 @@ String _getMaterial(String zone){
                                 items: _mapOptions.map((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
-                                    child: Text(value),
+                                    child: Text(_addNote(value)),
                                   );
                                 }).toList(),
                                 onChanged: (newValue) {

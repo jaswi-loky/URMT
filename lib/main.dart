@@ -3,7 +3,8 @@ import 'functionspage.dart';
 import 'summonpage.dart';
 import 'subsite.dart';
 import 'secondsite.dart';
-import 'update.dart'; 
+import 'update.dart';
+import 'navigation.dart';
 import 'dart:math';
 import 'dart:async';
 import 'package:http/http.dart' as http;
@@ -39,8 +40,10 @@ class _HomePageState extends State<HomePage> {
     '172.20.24.5-Ontario',
     '192.168.200.146-NY',
     '192.168.0.110-Monrovia',
+    '172.20.24.14-Marina Del Rey'
     '192.168.10.10-Connect to Robot',
-    '10.1.17.101-Qbay',
+    '10.1.16.127-Qbay'
+    
   ];
 
     final UpdateService _updateService = UpdateService();
@@ -204,6 +207,13 @@ class _HomePageState extends State<HomePage> {
         : (selectedIp ?? '');
         newIP = beforeDash;
     switch (label) {
+      case 'Navigate':
+        onPressed = () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => naviPage(newIp: newIP)),
+          );
+        };
+        break;
       case 'Summon':
         onPressed = () {
           Navigator.of(context).push(
