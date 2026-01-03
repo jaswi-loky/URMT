@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-<<<<<<< HEAD
 import 'updatesupport.dart';
-=======
->>>>>>> ceba4094252f63e8a9f9885bb4af7a9778d86f35
 
 class UpdateService {
   // Configure this URL
@@ -50,11 +47,7 @@ class UpdateService {
     print('Latest version code from server: $latestVersionCode');
 
     if (latestVersionCode > currentVersionCode) {
-<<<<<<< HEAD
       bool forceUpdate = false; // Or based on your versionInfo logic
-=======
-      bool forceUpdate = true; // Or based on your versionInfo logic
->>>>>>> ceba4094252f63e8a9f9885bb4af7a9778d86f35
       _showUpdateDialog(context, latestVersionName, releaseNotes, apkUrl, forceUpdate);
     } else {
       /*if (showNoUpdateDialog) {
@@ -96,19 +89,12 @@ class UpdateService {
                 ),
               TextButton(
                 child: const Text('Update Now'),
-<<<<<<< HEAD
                 onPressed: () async{
-=======
-                onPressed: () {
->>>>>>> ceba4094252f63e8a9f9885bb4af7a9778d86f35
                   // The original call to _downloadAndInstallApk is replaced by this.
                   _launchUpdateUrl(apkUrl, context);
                   // We can pop the dialog immediately as the browser will take over.
                   Navigator.of(context).pop();
-<<<<<<< HEAD
                   //await startSafeUpdateDialog(context, apkUrl);
-=======
->>>>>>> ceba4094252f63e8a9f9885bb4af7a9778d86f35
                 },
               ),
             ],

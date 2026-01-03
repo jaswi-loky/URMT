@@ -240,7 +240,6 @@ class _SummonPageState extends State<SummonPage> {
       _isIdle = true;
       _idleSeconds++;
 
-<<<<<<< HEAD
     if (_idleSeconds >= time_Limit) {
     // Force return after idle timeout
       _returnToCharging(context);
@@ -264,21 +263,6 @@ class _SummonPageState extends State<SummonPage> {
   // Any other activity → reset idle timer
     _reset();
   }
-=======
-      if (_idleSeconds >= time_Limit) {
-        _returnToCharging(context);
-        _reset();
-      }
-    } else if (status == "running" && target.startsWith("charge")) {
-      if (_isIdle && _idleSeconds < time_Limit && _selfReturn) {
-        _cancelCleaning(context);
-        _selfReturn = true;
-      }
-      _reset();
-    } else {
-      _reset();
-    }
->>>>>>> ceba4094252f63e8a9f9885bb4af7a9778d86f35
   });
 }
 

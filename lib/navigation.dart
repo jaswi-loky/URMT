@@ -16,11 +16,11 @@ enum Speed { slow, normal, fast }
 class _NavigatePageState extends State<naviPage> {
   Speed _selectedSpeed = Speed.normal;
   double speed = 0.7;
-  Timer? _timer;
+  Timer? _moveTimer;
+  Timer? _monitorTimer;
+  Timer? _decelTimer;
   DateTime? _pressTime;
-  int _idleSeconds = 0;
-  bool _isIdle = false;
-  bool _selfReturn = true;
+  bool _monitorStarted = false;
 
   int? _activeSectorIndex;
   
@@ -34,6 +34,13 @@ class _NavigatePageState extends State<naviPage> {
   double _lastLinear = 0;
   double _lastAngular = 0;
   bool _estopActive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    print("NAVIPAGE INIT");
+    startMonitoring();
+  }  
 
   Future<void> sendCommand(double angular, double linear) async {
     _lastAngular = angular;
@@ -53,12 +60,19 @@ class _NavigatePageState extends State<naviPage> {
     setState(() {
       _estopActive = !_estopActive;
     });
+
+    if (_estopActive) {
+      _moveTimer?.cancel();
+      _decelTimer?.cancel();
+      await sendCommand(0, 0);
+    }
+
     final flag = _estopActive ? 'true' : 'false';
-        String? robotIpAddress = widget.newIp;
-    final url = Uri.parse('http://$robotIpAddress:9001/api/estop?flag=$flag');
+    final ip = widget.newIp;
+    final url = Uri.parse('http://$ip:9001/api/estop?flag=$flag');
     try {
       await http.get(url);
-    } catch (e) {}
+    } catch (_) {}
   }
 
   void handleSectorTapDown(TapDownDetails details, double size, double innerCircle) {
@@ -95,20 +109,21 @@ class _NavigatePageState extends State<naviPage> {
   }
 
   void handlePress(String label) {
-    _pressTime = DateTime.now();
-    _timer?.cancel();
+    final DateTime pressTime = DateTime.now();
+    _pressTime = pressTime;
+    _moveTimer?.cancel();
     print(label);
     Duration period = const Duration(milliseconds: 100);
 
     if (label == 'F') {
       sendCommand(0, speed);
-      _timer = Timer.periodic(period, (_) {
+      _moveTimer = Timer.periodic(period, (_) {
         sendCommand(0, speed);
       });
     } else if (label == 'B') {
       sendCommand(3.1415926 / 4, 0);
-      _timer = Timer.periodic(period, (timer) {
-        final elapsed = DateTime.now().difference(_pressTime!).inMilliseconds;
+      _moveTimer = Timer.periodic(period, (timer) {
+        final elapsed = DateTime.now().difference(pressTime).inMilliseconds;
         if (elapsed <= 4000) {
           sendCommand(3.1415926 / 4, 0);
         } else {
@@ -117,8 +132,8 @@ class _NavigatePageState extends State<naviPage> {
       });
     } else if (label == 'L') {
       sendCommand(3.1415926 / 4, 0);
-      _timer = Timer.periodic(period, (timer) {
-        final elapsed = DateTime.now().difference(_pressTime!).inMilliseconds;
+      _moveTimer = Timer.periodic(period, (timer) {
+        final elapsed = DateTime.now().difference(pressTime).inMilliseconds;
         if (elapsed <= 2000) {
           sendCommand(3.1415926 / 4, 0);
         } else {
@@ -127,8 +142,8 @@ class _NavigatePageState extends State<naviPage> {
       });
     } else if (label == 'R') {
       sendCommand(-3.1415926 / 4, 0);
-      _timer = Timer.periodic(period, (timer) {
-        final elapsed = DateTime.now().difference(_pressTime!).inMilliseconds;
+      _moveTimer = Timer.periodic(period, (timer) {
+        final elapsed = DateTime.now().difference(pressTime).inMilliseconds;
         if (elapsed <= 2000) {
           sendCommand(-3.1415926 / 4, 0);
         } else {
@@ -137,8 +152,8 @@ class _NavigatePageState extends State<naviPage> {
       });
     } else if (label == 'FL') {
       sendCommand(3.1415926 / 4, 0);
-      _timer = Timer.periodic(period, (timer) {
-        final elapsed = DateTime.now().difference(_pressTime!).inMilliseconds;
+      _moveTimer = Timer.periodic(period, (timer) {
+        final elapsed = DateTime.now().difference(pressTime).inMilliseconds;
         if (elapsed <= 1000) {
           sendCommand(3.1415926 / 4, 0);
         } else {
@@ -147,8 +162,8 @@ class _NavigatePageState extends State<naviPage> {
       });
     } else if (label == 'FR') {
       sendCommand(-3.1415926 / 4, 0);
-      _timer = Timer.periodic(period, (timer) {
-        final elapsed = DateTime.now().difference(_pressTime!).inMilliseconds;
+      _moveTimer = Timer.periodic(period, (timer) {
+        final elapsed = DateTime.now().difference(pressTime).inMilliseconds;
         if (elapsed <= 1000) {
           sendCommand(-3.1415926 / 4, 0);
         } else {
@@ -157,8 +172,8 @@ class _NavigatePageState extends State<naviPage> {
       });
     } else if (label == 'BL') {
       sendCommand(3.1415926 / 4, 0);
-      _timer = Timer.periodic(period, (timer) {
-        final elapsed = DateTime.now().difference(_pressTime!).inMilliseconds;
+      _moveTimer = Timer.periodic(period, (timer) {
+        final elapsed = DateTime.now().difference(pressTime).inMilliseconds;
         if (elapsed <= 3000) {
           sendCommand(3.1415926 / 4, 0);
         } else {
@@ -167,8 +182,8 @@ class _NavigatePageState extends State<naviPage> {
       });
     } else if (label == 'BR') {
       sendCommand(-3.1415926 / 4, 0);
-      _timer = Timer.periodic(period, (timer) {
-        final elapsed = DateTime.now().difference(_pressTime!).inMilliseconds;
+      _moveTimer = Timer.periodic(period, (timer) {
+        final elapsed = DateTime.now().difference(pressTime).inMilliseconds;
         if (elapsed <= 3000) {
           sendCommand(-3.1415926 / 4, 0);
         } else {
@@ -179,17 +194,21 @@ class _NavigatePageState extends State<naviPage> {
   }
 
   void handleRelease(String label) async {
-    _timer?.cancel();
+    _moveTimer?.cancel();
     print("release");
 
     if (_lastAngular == 0 && _lastLinear.abs() > 0.01) {
       double currentLinear = _lastLinear;
-      double step = currentLinear.abs() / 10;
+      double step = currentLinear.abs() / 6;
       if (step < 0.01) step = 0.01;
-      Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      _decelTimer?.cancel();
+      _decelTimer = Timer.periodic(
+      const Duration(milliseconds: 30),
+        (timer) {
         if (currentLinear.abs() <= 0.01) {
           sendCommand(0, 0);
           timer.cancel();
+          _decelTimer = null;
         } else {
           if (currentLinear > 0) {
             currentLinear -= step;
@@ -207,60 +226,50 @@ class _NavigatePageState extends State<naviPage> {
     _pressTime = null;
   }
 
-  int? _labelToSectorIndex(String label) {
-    return labels.indexOf(label);
-  }
 
-  void startMonitoring(BuildContext context) {
-    _timer = Timer.periodic(Duration(seconds: 1), (_) async {
-    String? robotIpAddress = widget.newIp;
-    var url = Uri.parse('http://$robotIpAddress:9001/api/robot_status');
-    String status;
-    String target;
-    try{
-      var response = await http.get(url);
-      var decodedData = jsonDecode(response.body);
-      status = decodedData['results']['running_status'];
-      target = decodedData['results']['move_target'];
-    }catch(e){
-      status = "idle";
-      target = "";
-    }
-    
-    if (status == "running" && target.startsWith("charge")) {
-    if (_isIdle) {
-        if (_selfReturn) {
-          var cancelUrl = Uri.parse("http://$robotIpAddress:19001/api/tools/operation/task/cancel");
-          try{
-            http.post(cancelUrl);
-          }catch(e){
-            print("cancel error");
-          }
-          _selfReturn = false; // reset self-return flag
+  void startMonitoring() {
+  print("startMonitoring called, started=$_monitorStarted");
+  if (_monitorStarted) return;
+  _monitorStarted = true;
+  print("Monitoring started");
+  _monitorTimer = Timer.periodic(
+    const Duration(seconds: 1),
+    (_) async {
+      final ip = widget.newIp;
+      final statusUrl = Uri.parse(
+        'http://$ip:9001/api/robot_status'
+      );
+
+      try {
+        final response = await http.get(statusUrl);
+        final data = jsonDecode(response.body);
+        final status = data['results']['running_status'];
+        final target = data['results']['move_target'];
+
+        if (status == "running" && target.startsWith("charge")) {
+          final cancelUrl = Uri.parse(
+            "http://$ip:19001/api/tools/operation/task/cancel"
+          );
+          await http.post(cancelUrl);
+          print("cancel sent (charging detected)");
         }
-      }
-    _reset();
-  } else {
-  // Any other activity → reset idle timer
-    _reset();
-  }
-  });
+      } catch (_) {}
+    },
+  );
 }
 
+
   void stopMonitoring() {
-    _timer?.cancel();
-    _reset();
+    _monitorTimer?.cancel();
   }
 
-  void _reset() {
-    _isIdle = false;
-    _idleSeconds = 0;
-  }
 
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _moveTimer?.cancel();
+    _monitorTimer?.cancel();
+    _decelTimer?.cancel();
     super.dispose();
   }
 
@@ -282,7 +291,7 @@ class _NavigatePageState extends State<naviPage> {
     final double sizedBoxBetween = isLandscape ? 28 * 0.5 : 28;
     final double sizedBox24 = isLandscape ? 24 * 0.5 : 24;
 
-    startMonitoring(context);
+    //startMonitoring(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Navigate'),

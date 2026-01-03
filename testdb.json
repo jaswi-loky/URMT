@@ -1,0 +1,11 @@
+[
+    {
+        "id":"qbay",
+        "name":"Qbay Office",
+        "ipAddress":"10.1.16.127",
+        "points":["front_desk", "Kitchen"],
+        "8085page": true,
+        "H5name":"18019211111",
+        "H5password":"Urbot@2024"
+    }
+]

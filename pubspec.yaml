@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.1.0+15
+version: 1.1.0+21
 
 environment:
   sdk: ^3.8.0
@@ -40,21 +40,16 @@ dependencies:
   webview_flutter: ^4.13.0
   webview_flutter_android: ^4.7.0
   webview_flutter_wkwebview: ^3.13.0
-  package_info_plus: ^5.0.1        # To get current app version
-<<<<<<< HEAD
+  package_info_plus: ^8.0.0        # To get current app version
   path_provider: ^2.1.4            # To find a path for saving the APK
-=======
-  path_provider: ^2.1.2            # To find a path for saving the APK
->>>>>>> ceba4094252f63e8a9f9885bb4af7a9778d86f35
   open_filex: ^4.3.4                 # To open the downloaded APK for installation
   permission_handler: ^11.3.0 
   url_launcher: ^6.3.2
   shared_preferences: ^2.2.3
-<<<<<<< HEAD
   dio: ^5.9.0
   android_package_installer: ^0.0.3
-=======
->>>>>>> ceba4094252f63e8a9f9885bb4af7a9778d86f35
+  socket_io_client: ^2.0.3
+  crypto: ^3.0.7
 
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
